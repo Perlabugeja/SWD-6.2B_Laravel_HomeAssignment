@@ -1,68 +1,82 @@
 @extends('layouts.main')
 
 @section('content')
-    <div class="card-body">
-        <h1>Welcome Back</h1>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-body">
 
-        <form method="POST" action="/login">
-            @csrf
+                    <h1 class="mb-4 text-center">Welcome Back</h1>
 
-            <!-- Email -->
-            <label>
-                <input type="email"
-                        name="email"
-                        placeholder="[mail@example.com](<mailto:mail@example.com>)"
-                        value="{{ old('email') }}"
-                        class="input input-bordered @error('email') input-error @enderror"
-                        required
-                        autofocus>
-                <span>Email</span>
-            </label>
+                    <form method="POST" action="/login">
+                        @csrf
 
-            @error('email')
-                <div>
-                    <span class="label-text-alt text-error">{{ $message }}</span>
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email address</label>
+                            <input type="email"
+                                   id="email"
+                                   name="email"
+                                   class="form-control @error('email') is-invalid @enderror"
+                                   placeholder="mail@example.com"
+                                   value="{{ old('email') }}"
+                                   required
+                                   autofocus>
+
+                            @error('email')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password"
+                                   id="password"
+                                   name="password"
+                                   class="form-control @error('password') is-invalid @enderror"
+                                   placeholder="••••••••"
+                                   required>
+
+                            @error('password')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+
+                        <!-- Remember Me -->
+                        <div class="mb-3 form-check">
+                            <input type="checkbox"
+                                   name="remember"
+                                   class="form-check-input"
+                                   id="remember">
+                            <label class="form-check-label" for="remember">
+                                Remember me
+                            </label>
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                Sign In
+                            </button>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <p class="text-center text-sm">
+                        Don't have an account?
+                        <a href="/register">Register</a>
+                    </p>
+
                 </div>
-            @enderror
-
-            <!-- Password -->
-            <label>
-                <input type="password"
-                        name="password"
-                        placeholder="••••••••"
-                        class="input input-bordered @error('password') input-error @enderror"
-                        required>
-                <span>Password</span>
-            </label>
-
-            @error('password')
-                <div>
-                    <span class="label-text-alt text-error">{{ $message }}</span>
-                </div>
-            @enderror
-
-            <!-- Remember Me -->
-            <div>
-                <label class="label cursor-pointer justify-start">
-                    <input type="checkbox"
-                            name="remember"
-                            class="checkbox">
-                    <span class="label-text ml-2">Remember me</span>
-                </label>
             </div>
-
-            <!-- Submit Button -->
-            <div>
-                <button type="submit">
-                    Sign In
-                </button>
-            </div>
-        </form>
-
-        <div class="divider">OR</div>
-        <p class="text-center text-sm">
-            Don't have an account?
-            <a href="/register" class="link link-primary">Register</a>
-        </p>
+        </div>
     </div>
+</div>
 @endsection

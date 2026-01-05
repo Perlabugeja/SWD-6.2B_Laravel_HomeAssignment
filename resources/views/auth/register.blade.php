@@ -1,84 +1,105 @@
+@extends('layouts.main')
 
-    <x-slot:title>
-        Register
-    </x-slot:title>
+@section('content')
+<x-slot:title>
+    Register
+</x-slot:title>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
                 <div class="card-body">
-                    <h1>Create Account</h1>
+
+                    <h1 class="mb-4 text-center">Create Account</h1>
 
                     <form method="POST" action="/register">
                         @csrf
 
                         <!-- Name -->
-                        <label>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name</label>
                             <input type="text"
+                                   id="name"
                                    name="name"
+                                   class="form-control @error('name') is-invalid @enderror"
                                    placeholder="John Doe"
                                    value="{{ old('name') }}"
-                                   class="input input-bordered @error('name') input-error @enderror"
                                    required>
-                            <span>Name</span>
-                        </label>
 
-                        @error('name')
-                            <div>
-                                <span class="label-text-alt text-error">{{ $message }}</span>
-                            </div>
-                        @enderror
+                            @error('name')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
 
                         <!-- Email -->
-                        <label>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email address</label>
                             <input type="email"
+                                   id="email"
                                    name="email"
-                                   placeholder="[mail@example.com](<mailto:mail@example.com>)"
+                                   class="form-control @error('email') is-invalid @enderror"
+                                   placeholder="mail@example.com"
                                    value="{{ old('email') }}"
-                                   class="input input-bordered @error('email') input-error @enderror"
                                    required>
-                            <span>Email</span>
-                        </label>
 
-                        @error('email')
-                            <div>
-                                <span class="label-text-alt text-error">{{ $message }}</span>
-                            </div>
-                        @enderror
+                            @error('email')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
 
                         <!-- Password -->
-                        <label>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
                             <input type="password"
+                                   id="password"
                                    name="password"
+                                   class="form-control @error('password') is-invalid @enderror"
                                    placeholder="••••••••"
-                                   class="input input-bordered @error('password') input-error @enderror"
                                    required>
-                            <span>Password</span>
-                        </label>
 
-                        @error('password')
-                            <div>
-                                <span class="label-text-alt text-error">{{ $message }}</span>
-                            </div>
-                        @enderror
+                            @error('password')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
 
                         <!-- Password Confirmation -->
-                        <label>
+                        <div class="mb-3">
+                            <label for="password_confirmation" class="form-label">
+                                Confirm Password
+                            </label>
                             <input type="password"
+                                   id="password_confirmation"
                                    name="password_confirmation"
+                                   class="form-control"
                                    placeholder="••••••••"
-                                   class="input input-bordered"
                                    required>
-                            <span>Confirm Password</span>
-                        </label>
+                        </div>
 
-                        <!-- Submit Button -->
-                        <div>
-                            <button type="submit">
+                        <!-- Submit -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
                                 Register
                             </button>
                         </div>
                     </form>
 
-                    <div class="divider">OR</div>
-                    <p >
+                    <hr class="my-4">
+
+                    <p class="text-center">
                         Already have an account?
-                        <a href="/login" class="link link-primary">Sign in</a>
+                        <a href="/login">Sign in</a>
                     </p>
+
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection

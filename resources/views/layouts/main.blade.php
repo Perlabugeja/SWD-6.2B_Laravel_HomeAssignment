@@ -5,45 +5,25 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>My Contact</title>
+    <title>Songify</title>
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Varela+Round">
     <!-- Bootstrap -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
+    @vite('resources/sass/app.scss')
+    @vite('resources/js/app.js')
   </head>
   <body>
-    <!-- navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light">
-      <div class="container">
-        <a class="navbar-brand text-uppercase" href="index.html">            
-            <strong>Contact</strong> App
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-toggler" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-            
-        <!-- /.navbar-header -->
-        <div class="navbar-end gap-2">
-            @auth
-                <span class="text-sm">{{ auth()->user()->name }}</span>
-                <form method="POST" action="/logout" class="inline">
-                    @csrf
-                    <button type="submit" class="btn btn-ghost btn-sm">Logout</button>
-                </form>
-            @else
-                <a href="/login" class="btn btn-ghost btn-sm">Sign In</a>
-                <a href="{{ route('register') }}" class="btn btn-primary btn-sm">Sign Up</a>
-            @endauth
-</div>
-    </nav>
-
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Navbar</a>   
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">Home</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
     @yield('content')
-
-    <script src="{{ asset('js/app.js') }}"></script>
-    <script src="{{ asset('js/jquery.min.js') }}"></script>
-    <script src="{{ asset('js/popper.min.js') }}"></script>
-    <script src="{{ asset('js/bootstrap.min.js') }}"></script>
   </body>
 </html>
