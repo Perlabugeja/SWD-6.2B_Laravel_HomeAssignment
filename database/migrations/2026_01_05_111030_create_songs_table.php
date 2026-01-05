@@ -16,6 +16,8 @@ return new class extends Migration
             $table->timestamps();
             $table->string('songname');
             $table->string('genre');
+
+            $table->foreignId('playlist_id')->references('id')->on('playlists');
         });
     }
 
