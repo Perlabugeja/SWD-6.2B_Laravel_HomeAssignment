@@ -44,5 +44,33 @@ class SongController extends Controller
         return redirect('/playlists')->with('success', 'Song added!');
     }
 
+    public function edit(Song $song)
+    {
+        return view('songs.edit', compact('song'));
+    }
+
+    public function update(Request $request, Song $song)
+    {
+        $request->validate([
+            'songname' => 'required|string|max:255',
+            'genre' => 'required|string|max:255',
+        ]);
+
+        $song->update([
+            'songname' => $request->songname,
+            'genre' => $request->genre,
+        ]);
+
+        return redirect()->route('playlists.index')->with('success', 'Song updated successfully!');
+    }
+
+    public function destroy(Song $song)
+    {
+        $song->delete();
+        return redirect()->route('playlists.index')->with('success', 'Song deleted successfully!');
+    }
+
+
+
 
 }

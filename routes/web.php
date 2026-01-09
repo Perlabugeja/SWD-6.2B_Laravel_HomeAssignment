@@ -33,5 +33,13 @@ Route::middleware('auth')->group(function () {
     // Add song page
     Route::get('/songs/create', [SongController::class, 'create'])->name('songs.create');
     Route::post('/songs', [SongController::class, 'store'])->name('songs.store');
-});
 
+    // Edit song page
+    Route::get('/songs/{song}/edit', [SongController::class, 'edit'])->name('songs.edit');
+
+    // Update song
+    Route::put('/songs/{song}', [SongController::class, 'update'])->name('songs.update');
+
+    // Delete song
+    Route::delete('/songs/{song}', [SongController::class, 'destroy'])->name('songs.destroy');
+});
