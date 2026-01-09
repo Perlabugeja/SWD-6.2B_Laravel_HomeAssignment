@@ -19,7 +19,7 @@ class Playlist extends Model
     }
 
     // Enable Mass Assignment
-    protected $fillable = ['id', 'playlistname', 'user_id'];
+    protected $fillable = ['playlistname', 'user_id'];
 }
 
 
