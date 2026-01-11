@@ -30,7 +30,7 @@
             <div class="mb-3">
                 <label for="playlistname" class="form-label">Playlist Name</label>
                 <input type="text" id="playlistname" name="playlistname" class="form-control"
-                       value="{{ old('playlistname', $playlist->playlistname ?? '') }}" required>
+                       value="{{ old('playlistname', $playlist->playlistname ?? 'My Playlist') }}" required>
                 @error('playlistname')
                     <div class="text-danger mt-1">{{ $message }}</div>
                 @enderror

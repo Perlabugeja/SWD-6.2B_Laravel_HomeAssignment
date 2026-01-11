@@ -12,6 +12,8 @@
 }
 .playlist-page h2 {
     color: #435d7d;
+    text-align: center;
+    margin-bottom: 20px;
 }
 </style>
 @endpush
@@ -19,18 +21,21 @@
 @section('content')
 <div class="playlist-page">
     <div class="form-wrapper mx-auto" style="max-width: 500px;">
-        <h2 class="mb-4 text-center">Add New Song</h2>
+        <h2>Add New Song</h2>
 
         <form method="POST" action="{{ route('songs.store') }}">
             @csrf
+
             <div class="mb-3">
-                <label class="form-label">Song Name</label>
-                <input type="text" name="songname" class="form-control" required>
+                <label for="songname" class="form-label">Song Name</label>
+                <input type="text" id="songname" name="songname" class="form-control" value="{{ old('songname') }}" required>
+                @error('songname')<div class="text-danger mt-1">{{ $message }}</div>@enderror
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Genre</label>
-                <input type="text" name="genre" class="form-control" required>
+                <label for="genre" class="form-label">Genre</label>
+                <input type="text" id="genre" name="genre" class="form-control" value="{{ old('genre') }}" required>
+                @error('genre')<div class="text-danger mt-1">{{ $message }}</div>@enderror
             </div>
 
             <div class="d-flex justify-content-between">

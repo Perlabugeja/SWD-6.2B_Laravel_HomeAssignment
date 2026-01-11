@@ -3,7 +3,6 @@
 @section('title', 'Manage Songs')
 
 @push('styles')
-<!-- Playlist Page CSS -->
 <style>
 body {
     color: #566787;
@@ -18,16 +17,22 @@ body {
     border-radius: 3px;
     box-shadow: 0 1px 1px rgba(0,0,0,.05);
 }
-.table-title {        
+.table-title {
     padding: 16px 30px;
     margin-bottom: 15px;
-    background: #364658ff;
+    background: #364658;
     color: #fff;
     border-radius: 3px 3px 0 0;
 }
 .table-title h2 {
     margin: 0;
     font-size: 24px;
+}
+.table-title .playlist-name {
+    text-align: center;
+    font-size: 16px;
+    opacity: 0.9;
+    margin-top: 5px;
 }
 .table-title .btn {
     color: #fff;
@@ -49,10 +54,19 @@ body {
 <div class="playlist-page">
     <div class="table-wrapper">
         <div class="table-title d-flex justify-content-between align-items-center">
-            <h2>Manage <b>Songs</b></h2>
-            <a href="{{ route('songs.create') }}" class="btn btn-success">
-                <i class="material-icons">&#xE147;</i> Add New Song
-            </a>
+            <div>
+                <h2>Manage <b>Songs</b></h2>
+
+                <!-- PLAYLIST NAME ADDED HERE -->
+                <div class="playlist-name">
+                    {{ $songs->first()?->playlist?->playlistname ?? 'My Playlist' }}
+                </div>
+            </div>
+
+            <div>
+                <a href="{{ route('songs.create') }}" class="btn btn-success">Add New Song</a>
+                <a href="{{ route('playlist.edit') }}" class="btn btn-primary">Edit Playlist Name</a>
+            </div>
         </div>
 
         <table class="table table-striped table-hover">
@@ -60,6 +74,7 @@ body {
                 <tr>
                     <th>Song Name</th>
                     <th>Genre</th>
+                    <th>Playlist</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -68,23 +83,20 @@ body {
                 <tr>
                     <td>{{ $song->songname }}</td>
                     <td>{{ $song->genre }}</td>
+                    <td>{{ $song->playlist->playlistname ?? 'My Playlist' }}</td>
                     <td>
-                        <a href="{{ route('songs.edit', $song) }}" class="btn btn-info btn-sm">
-                            <i class="material-icons">&#xE254;</i> Edit
-                        </a>
+                        <a href="{{ route('songs.edit', $song) }}" class="btn btn-info btn-sm">Edit</a>
                         <form action="{{ route('songs.destroy', $song) }}" method="POST" style="display:inline-block;">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">
-                                <i class="material-icons">&#xE872;</i> Delete
-                            </button>
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                         </form>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="3" class="text-center text-muted">
-                        Your playlist is empty. Add your first song 🎵
+                    <td colspan="4" class="text-center text-muted">
+                        Your playlist is empty. Add your first song.
                     </td>
                 </tr>
                 @endforelse

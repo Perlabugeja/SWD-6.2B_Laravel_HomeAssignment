@@ -9,37 +9,37 @@ use App\Http\Controllers\SongController;
 // Homepage (after login)
 Route::get('/', function () {
     return view('home'); 
-})->middleware('auth');
+})->middleware('auth')->name('home');
 
 // Login routes
-Route::get('/login', function () {
-    return view('auth.login');
-})->middleware('guest')->name('login');
+Route::middleware('guest')->group(function () {
+    Route::get('/login', function () {
+        return view('auth.login');
+    })->name('login');
 
-Route::post('/login', Login::class)->middleware('guest');
+    Route::post('/login', Login::class);
+    
+    Route::view('/register', 'auth.register')->name('register');
+    Route::post('/register', Register::class);
+});
 
 // Logout route
 Route::post('/logout', Logout::class)->middleware('auth')->name('logout');
 
-// Registration routes
-Route::view('/register', 'auth.register')->middleware('guest')->name('register');
-Route::post('/register', Register::class)->middleware('guest');
-
-// Playlist / Song routes
+// Playlist and Song routes
 Route::middleware('auth')->group(function () {
-    // Playlist page
+
+    // Playlist page - list all songs
     Route::get('/playlists', [SongController::class, 'index'])->name('playlists.index');
 
-    // Add song page
+    // Song CRUD
     Route::get('/songs/create', [SongController::class, 'create'])->name('songs.create');
     Route::post('/songs', [SongController::class, 'store'])->name('songs.store');
-
-    // Edit song page
     Route::get('/songs/{song}/edit', [SongController::class, 'edit'])->name('songs.edit');
-
-    // Update song
     Route::put('/songs/{song}', [SongController::class, 'update'])->name('songs.update');
-
-    // Delete song
     Route::delete('/songs/{song}', [SongController::class, 'destroy'])->name('songs.destroy');
+
+    // Playlist name edit
+    Route::get('/playlists/edit', [SongController::class, 'editPlaylist'])->name('playlist.edit');
+    Route::put('/playlists/update', [SongController::class, 'updatePlaylist'])->name('playlists.update');
 });
