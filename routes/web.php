@@ -6,30 +6,24 @@ use App\Http\Controllers\Auth\Logout;
 use App\Http\Controllers\Auth\Register;
 use App\Http\Controllers\SongController;
 
-// Homepage (after login)
-Route::get('/', function () {
-    return view('home'); 
-})->middleware('auth')->name('home');
+// Homepage
+Route::get('/', fn() => view('home'))->middleware('auth')->name('home');
 
-// Login routes
+// Login & Register
 Route::middleware('guest')->group(function () {
-    Route::get('/login', function () {
-        return view('auth.login');
-    })->name('login');
-
+    Route::get('/login', fn() => view('auth.login'))->name('login');
     Route::post('/login', Login::class);
-    
     Route::view('/register', 'auth.register')->name('register');
     Route::post('/register', Register::class);
 });
 
-// Logout route
+// Logout
 Route::post('/logout', Logout::class)->middleware('auth')->name('logout');
 
-// Playlist and Song routes
+// Playlist & Song routes
 Route::middleware('auth')->group(function () {
 
-    // Playlist page - list all songs
+    // Playlist page
     Route::get('/playlists', [SongController::class, 'index'])->name('playlists.index');
 
     // Song CRUD

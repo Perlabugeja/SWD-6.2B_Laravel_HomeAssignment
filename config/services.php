@@ -32,7 +32,10 @@ return [
     ],
 
     'detectlanguage' => [
-    'key' => env('DETECTLANGUAGE_API_KEY'),
-],
+        'key' => env('DETECTLANGUAGE_KEY'),
+    ],
+    'openai' => [
+        'key' => env('OPENAI_KEY'),
+    ]
 
 ];

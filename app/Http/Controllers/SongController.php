@@ -7,18 +7,19 @@ use App\Models\Playlist;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Validation\ValidationException;
 
 class SongController extends Controller
 {
-    // Display all songs for the user's playlists
+    // List all songs for the user's playlist
     public function index()
     {
         $songs = Song::whereHas('playlist', function ($query) {
             $query->where('user_id', Auth::id());
         })->get();
 
-        return view('playlists.show', compact('songs'));
+        $playlist = Playlist::where('user_id', Auth::id())->first();
+
+        return view('playlists.show', compact('songs', 'playlist'));
     }
 
     // Show form to create a new song
@@ -35,7 +36,6 @@ class SongController extends Controller
             'genre' => 'required|string|min:2',
         ]);
 
-        // Default playlist or first playlist of the user
         $playlist = Playlist::firstOrCreate(
             ['user_id' => Auth::id()],
             ['playlistname' => 'My Playlist']
@@ -50,58 +50,99 @@ class SongController extends Controller
         return redirect()->route('playlists.index')->with('success', 'Song added!');
     }
 
-// Show form to edit playlist name
-public function editPlaylist()
-{
-    // Get the user's playlist or create a default one
-    $playlist = Playlist::firstOrCreate(
-        ['user_id' => Auth::id()],
-        ['playlistname' => 'My Playlist'] // default name if none exists
-    );
-
-    return view('playlists.edit-playlist', compact('playlist'));
-}
-
-// Update playlist name
-public function updatePlaylist(Request $request)
-{
-    $request->validate([
-        'playlistname' => 'required|string|min:2',
-    ]);
-
-    $playlist = Playlist::where('user_id', Auth::id())->first();
-
-    // No numbers allowed
-    if (strpbrk($request->playlistname, '0123456789') !== false) {
-        return back()->withErrors(['playlistname' => 'Playlist name cannot contain numbers.']);
+    // Show form to edit a song
+    public function edit(Song $song)
+    {
+        return view('songs.edit', compact('song'));
     }
 
-    // External API – gibberish detection (skip if local to avoid SSL errors)
-    if (config('app.env') !== 'local') {
+    // Update a song
+    public function update(Request $request, Song $song)
+    {
+        $request->validate([
+            'songname' => 'required|string|max:255',
+            'genre' => 'required|string|max:255',
+        ]);
+
+        $song->update([
+            'songname' => $request->songname,
+            'genre' => $request->genre,
+        ]);
+
+        return redirect()->route('playlists.index')->with('success', 'Song updated!');
+    }
+
+    // Delete a song
+    public function destroy(Song $song)
+    {
+        $song->delete();
+        return redirect()->route('playlists.index')->with('success', 'Song deleted!');
+    }
+
+    // Show form to edit playlist name
+    public function editPlaylist()
+    {
+        $playlist = Playlist::where('user_id', Auth::id())->first();
+        return view('playlists.edit-playlist', compact('playlist'));
+    }
+
+    // Update playlist name with DetectLanguage API check
+    public function updatePlaylist(Request $request)
+    {
+        $request->validate([
+            'playlistname' => 'required|string|min:2',
+        ]);
+
+        $playlistName = $request->input('playlistname');
+
         try {
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . config('services.detectlanguage.key'),
-            ])->post('https://ws.detectlanguage.com/0.2/detect', [
-                'q' => $request->playlistname
-            ]);
+            $response = Http::withToken(env('DETECTLANGUAGE_KEY'))
+                ->withOptions(['verify' => false]) // only for local dev
+                ->post('https://ws.detectlanguage.com/v3/detect', [
+                    'q' => $playlistName
+                ]);
 
-            $confidence = $response['data']['detections'][0]['confidence'] ?? 0;
+            $data = $response->json();
 
-            if ($confidence < 0.4) {
-                return back()->withErrors(['playlistname' => 'Playlist name does not appear to be meaningful.']);
+            // Debug: show full response from DetectLanguage
+            dump($data);
+
+            $englishDetected = false;
+
+            // Loop through each detection
+            if (is_array($data)) {
+                foreach ($data as $detection) {
+                    // Debug: show each detection individually
+                    dump($detection);
+
+                    if (isset($detection['language'], $detection['score']) &&
+                        $detection['language'] === 'en' &&
+                        $detection['score'] >= 0.1
+                    ) {
+                        $englishDetected = true;
+                        break;
+                    }
+                }
             }
+
+            if (!$englishDetected) {
+                return back()->withErrors([
+                    'playlistname' => 'Playlist name must be valid English words.'
+                ]);
+            }
+
         } catch (\Exception $e) {
-            // API failed, log but allow local update
-            info('DetectLanguage API failed: ' . $e->getMessage());
+            return back()->withErrors([
+                'playlistname' => 'Error checking playlist name language: ' . $e->getMessage()
+            ]);
         }
+
+        // Update or create playlist
+        Playlist::updateOrCreate(
+            ['user_id' => Auth::id()],
+            ['playlistname' => $playlistName]
+        );
+
+        return redirect()->route('playlists.index')->with('success', 'Playlist name updated!');
     }
-
-    // Update playlist name
-    $playlist->update([
-        'playlistname' => $request->playlistname
-    ]);
-
-    return redirect()->route('playlists.index')->with('success', 'Playlist name updated!');
-}
-
 }

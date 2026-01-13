@@ -57,9 +57,9 @@ body {
             <div>
                 <h2>Manage <b>Songs</b></h2>
 
-                <!-- PLAYLIST NAME ADDED HERE -->
+                <!-- Playlist name displayed -->
                 <div class="playlist-name">
-                    {{ $songs->first()?->playlist?->playlistname ?? 'My Playlist' }}
+                    {{ $playlist?->playlistname ?? 'My Playlist' }}  <!-- Find playlist exist get playlistname if not display my playlist -->
                 </div>
             </div>
 
@@ -74,7 +74,6 @@ body {
                 <tr>
                     <th>Song Name</th>
                     <th>Genre</th>
-                    <th>Playlist</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -83,7 +82,6 @@ body {
                 <tr>
                     <td>{{ $song->songname }}</td>
                     <td>{{ $song->genre }}</td>
-                    <td>{{ $song->playlist->playlistname ?? 'My Playlist' }}</td>
                     <td>
                         <a href="{{ route('songs.edit', $song) }}" class="btn btn-info btn-sm">Edit</a>
                         <form action="{{ route('songs.destroy', $song) }}" method="POST" style="display:inline-block;">
@@ -95,7 +93,7 @@ body {
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="4" class="text-center text-muted">
+                    <td colspan="3" class="text-center text-muted">
                         Your playlist is empty. Add your first song.
                     </td>
                 </tr>
