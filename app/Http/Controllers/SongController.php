@@ -7,28 +7,38 @@ use App\Models\Playlist;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Validation\ValidationException;
 
 class SongController extends Controller
 {
-    // List all songs for the user's playlist
-    public function index()
+    // List songs with sorting
+    public function index(Request $request)
     {
+        $sort = $request->query('sort', 'asc');
+
+        // Whitelist sorting direction
+        if (!in_array($sort, ['asc', 'desc'])) {
+            $sort = 'asc';
+        }
+
         $songs = Song::whereHas('playlist', function ($query) {
             $query->where('user_id', Auth::id());
-        })->get();
+        })
+        ->orderBy('songname', $sort)
+        ->get();
 
         $playlist = Playlist::where('user_id', Auth::id())->first();
 
-        return view('playlists.show', compact('songs', 'playlist'));
+        return view('playlists.show', compact('songs', 'playlist', 'sort'));
     }
 
-    // Show form to create a new song
+    // Show create form
     public function create()
     {
         return view('playlists.create');
     }
 
-    // Store new song
+    // Store song
     public function store(Request $request)
     {
         $request->validate([
@@ -50,13 +60,13 @@ class SongController extends Controller
         return redirect()->route('playlists.index')->with('success', 'Song added!');
     }
 
-    // Show form to edit a song
+    // Edit song
     public function edit(Song $song)
     {
         return view('songs.edit', compact('song'));
     }
 
-    // Update a song
+    // Update song
     public function update(Request $request, Song $song)
     {
         $request->validate([
@@ -64,80 +74,55 @@ class SongController extends Controller
             'genre' => 'required|string|max:255',
         ]);
 
-        $song->update([
-            'songname' => $request->songname,
-            'genre' => $request->genre,
-        ]);
+        $song->update($request->only('songname', 'genre'));
 
         return redirect()->route('playlists.index')->with('success', 'Song updated!');
     }
 
-    // Delete a song
+    // Delete song
     public function destroy(Song $song)
     {
         $song->delete();
         return redirect()->route('playlists.index')->with('success', 'Song deleted!');
     }
 
-    // Show form to edit playlist name
+    // Edit playlist name
     public function editPlaylist()
     {
         $playlist = Playlist::where('user_id', Auth::id())->first();
         return view('playlists.edit-playlist', compact('playlist'));
     }
 
-    // Update playlist name with DetectLanguage API check
+    // Update playlist name with API validation
     public function updatePlaylist(Request $request)
     {
         $request->validate([
             'playlistname' => 'required|string|min:2',
         ]);
 
-        $playlistName = $request->input('playlistname');
+        $playlistName = $request->playlistname;
 
-        try {
-            $response = Http::withToken(env('DETECTLANGUAGE_KEY'))
-                ->withOptions(['verify' => false]) // only for local dev
-                ->post('https://ws.detectlanguage.com/v3/detect', [
-                    'q' => $playlistName
-                ]);
-
-            $data = $response->json();
-
-            // Debug: show full response from DetectLanguage
-            dump($data);
-
-            $englishDetected = false;
-
-            // Loop through each detection
-            if (is_array($data)) {
-                foreach ($data as $detection) {
-                    // Debug: show each detection individually
-                    dump($detection);
-
-                    if (isset($detection['language'], $detection['score']) &&
-                        $detection['language'] === 'en' &&
-                        $detection['score'] >= 0.1
-                    ) {
-                        $englishDetected = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!$englishDetected) {
-                return back()->withErrors([
-                    'playlistname' => 'Playlist name must be valid English words.'
-                ]);
-            }
-
-        } catch (\Exception $e) {
-            return back()->withErrors([
-                'playlistname' => 'Error checking playlist name language: ' . $e->getMessage()
+        // No numbers allowed (no regex)
+        if (strpbrk($playlistName, '0123456789') !== false) {
+            throw ValidationException::withMessages([
+                'playlistname' => 'Playlist name cannot contain numbers.'
             ]);
         }
 
-        // Update or create playlist
+        // External API validation (DetectLanguage)
+        $response = Http::withToken(env('DETECTLANGUAGE_KEY'))
+            ->post('https://ws.detectlanguage.com/0.2/detect', [
+                'q' => $playlistName
+            ]);
+
+        $confidence = $response['data']['detections'][0]['confidence'] ?? 0;
+
+        if ($confidence < 0.4) {
+            throw ValidationException::withMessages([
+                'playlistname' => 'Playlist name does not appear to be meaningful English.'
+            ]);
+        }
+
         Playlist::updateOrCreate(
             ['user_id' => Auth::id()],
             ['playlistname' => $playlistName]
