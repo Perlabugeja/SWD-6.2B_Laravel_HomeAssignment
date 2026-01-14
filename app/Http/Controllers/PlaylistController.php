@@ -23,10 +23,8 @@ class PlaylistController extends Controller
 
         $genre = $request->query('genre');
 
-        // Get the current user's playlist
         $playlist = Playlist::where('user_id', Auth::id())->first();
 
-        // Get all songs belonging to this user's playlist
         $songsQuery = Song::where('playlist_id', $playlist?->id ?? 0);
 
         if ($genre) {
@@ -35,7 +33,6 @@ class PlaylistController extends Controller
 
         $songs = $songsQuery->orderBy('songname', $sort)->get();
 
-        // Get distinct genres for filter dropdown
         $genres = Song::where('playlist_id', $playlist?->id ?? 0)
             ->distinct()
             ->pluck('genre');
@@ -53,7 +50,6 @@ class PlaylistController extends Controller
     /* Update playlist name with validation */
     public function update(Request $request)
     {
-        // Basic validation
         $request->validate([
             'playlistname' => 'required|string|min:2',
         ]);
@@ -81,6 +77,9 @@ class PlaylistController extends Controller
             ]);
         }
 
+        // Check for profanity
+        $this->checkProfanity($name);
+
         // Create or update playlist
         Playlist::updateOrCreate(
             ['user_id' => Auth::id()],
@@ -96,7 +95,6 @@ class PlaylistController extends Controller
     {
         $http = Http::withToken(env('DETECTLANGUAGE_KEY'));
 
-        // Skip SSL verification in local dev
         if (app()->environment('local')) {
             $http = $http->withoutVerifying();
         }
@@ -106,5 +104,46 @@ class PlaylistController extends Controller
         $confidence = $response['data']['detections'][0]['confidence'] ?? 0;
 
         return $confidence >= 0.4;
+    }
+
+    /**
+     * Check for profanity using APILayer Bad Words API
+     */
+    private function checkProfanity(string $text)
+    {
+        $apiKey = env('APILAYER_BADWORDS_KEY');
+
+        $http = Http::withHeaders([
+            'apikey' => $apiKey,
+        ]);
+
+        // Skip SSL verification locally
+        if (app()->environment('local')) {
+            $http = $http->withoutVerifying();
+        }
+
+        $response = $http->post('https://api.apilayer.com/bad_words', [
+            'body' => $text,
+        ]);
+
+        // Debug: uncomment to see API response
+        // dd($response->json());
+
+        if (!$response->ok()) {
+            throw ValidationException::withMessages([
+                'playlistname' => 'Unable to validate playlist name at this time.',
+            ]);
+        }
+
+        $data = $response->json();
+
+        // The API returns "bad_words_total" or "bad_words_list" depending on your plan
+        $badWordsCount = $data['bad_words_total'] ?? 0;
+
+        if ($badWordsCount > 0) {
+            throw ValidationException::withMessages([
+                'playlistname' => 'Playlist name contains inappropriate language.',
+            ]);
+        }
     }
 }

@@ -34,8 +34,8 @@ return [
     'detectlanguage' => [
         'key' => env('DETECTLANGUAGE_KEY'),
     ],
-    'openai' => [
-        'key' => env('OPENAI_KEY'),
+    'badwords' => [
+        'key' => env('APILAYER_BADWORDS_KEY'),
     ]
 
 ];
