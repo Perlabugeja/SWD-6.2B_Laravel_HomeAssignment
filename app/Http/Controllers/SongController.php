@@ -21,6 +21,8 @@ class SongController extends Controller
         $request->validate([
             'songname' => 'required|string|min:2',
             'genre' => 'required|string|min:2',
+            'artist' => 'required|string|min:2',
+            'duration' => 'required|string|min:1', 
         ]);
 
         $playlist = Playlist::firstOrCreate(
@@ -31,6 +33,8 @@ class SongController extends Controller
         Song::create([
             'songname' => $request->songname,
             'genre' => $request->genre,
+            'artist' => $request->artist,
+            'duration' => $request->duration,
             'playlist_id' => $playlist->id,
         ]);
 
@@ -49,9 +53,11 @@ class SongController extends Controller
         $request->validate([
             'songname' => 'required|string|max:255',
             'genre' => 'required|string|max:255',
+            'artist' => 'required|string|max:255',
+            'duration' => 'required|string|max:10',
         ]);
 
-        $song->update($request->only('songname', 'genre'));
+        $song->update($request->only('songname', 'genre', 'artist', 'duration'));
 
         return redirect()->route('playlists.index')->with('success', 'Song updated!');
     }

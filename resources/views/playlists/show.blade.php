@@ -6,6 +6,7 @@
 <div class="playlist-page">
     <div class="table-wrapper">
 
+        <!-- Header -->
         <div class="table-title d-flex justify-content-between align-items-center">
             <div>
                 <h2>Manage <b>Songs</b></h2>
@@ -18,6 +19,7 @@
             </div>
         </div>
 
+        <!-- Sorting & Filtering -->
         <div class="mb-3 d-flex justify-content-between align-items-center">
             <div class="sort-buttons">
                 <span class="me-2">Sort:</span>
@@ -39,11 +41,14 @@
             </form>
         </div>
 
+        <!-- Songs Table -->
         <table class="table table-striped table-hover">
             <thead>
                 <tr>
                     <th>Song Name</th>
+                    <th>Artist/Band</th>
                     <th>Genre</th>
+                    <th>Duration</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -51,7 +56,9 @@
                 @forelse ($songs as $song)
                     <tr>
                         <td>{{ $song->songname }}</td>
+                        <td>{{ $song->artist }}</td>
                         <td>{{ $song->genre }}</td>
+                        <td>{{ $song->duration }}</td>
                         <td>
                             <a href="{{ route('songs.edit', $song) }}" class="btn btn-info btn-sm">Edit</a>
                             <form action="{{ route('songs.destroy', $song) }}" method="POST" style="display:inline-block;">
@@ -63,7 +70,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="3" class="text-center text-muted">
+                        <td colspan="5" class="text-center text-muted">
                             Your playlist is empty or no songs match this genre. Add your first song.
                         </td>
                     </tr>

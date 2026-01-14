@@ -10,6 +10,8 @@ class Song extends Model
         'songname',
         'genre',
         'playlist_id',
+        'artist',
+        'duration'
     ];
 
     public function playlist()
