@@ -68,36 +68,42 @@ body {
         <div class="table-title d-flex justify-content-between align-items-center">
             <div>
                 <h2>Manage <b>Songs</b></h2>
-
-                <!-- Playlist name -->
-                <div class="playlist-name">
-                    {{ $playlist?->playlistname ?? 'My Playlist' }}
-                </div>
+                <div class="playlist-name">{{ $playlist?->playlistname ?? 'My Playlist' }}</div>
             </div>
 
             <div>
-                <a href="{{ route('songs.create') }}" class="btn btn-success">
-                    Add New Song
-                </a>
-                <a href="{{ route('playlist.edit') }}" class="btn btn-primary">
-                    Edit Playlist Name
-                </a>
+                <a href="{{ route('songs.create') }}" class="btn btn-success">Add New Song</a>
+                <a href="{{ route('playlist.edit') }}" class="btn btn-primary">Edit Playlist Name</a>
             </div>
         </div>
 
-        <!-- SORT BUTTONS -->
-        <div class="mb-3 text-end sort-buttons">
-            <span class="me-2">Sort:</span>
+        <!-- SORT & FILTER -->
+        <div class="mb-3 d-flex justify-content-between align-items-center">
 
-            <a href="{{ route('playlists.index', ['sort' => 'asc']) }}"
-               class="btn btn-sm {{ request('sort', 'asc') === 'asc' ? 'active' : '' }}">
-                A–Z
-            </a>
+            <!-- SORT BUTTONS -->
+            <div class="sort-buttons">
+                <span class="me-2">Sort:</span>
+                <a href="{{ route('playlists.index', array_merge(request()->query(), ['sort' => 'asc'])) }}"
+                   class="btn btn-sm {{ request('sort', 'asc') === 'asc' ? 'active' : '' }}">
+                   A–Z
+                </a>
+                <a href="{{ route('playlists.index', array_merge(request()->query(), ['sort' => 'desc'])) }}"
+                   class="btn btn-sm {{ request('sort') === 'desc' ? 'active' : '' }}">
+                   Z–A
+                </a>
+            </div>
 
-            <a href="{{ route('playlists.index', ['sort' => 'desc']) }}"
-               class="btn btn-sm {{ request('sort') === 'desc' ? 'active' : '' }}">
-                Z–A
-            </a>
+            <!-- GENRE FILTER -->
+            <form method="GET" action="{{ route('playlists.index') }}" class="d-flex align-items-center">
+                <label for="genre" class="me-2 mb-0">Filter by Genre:</label>
+                <select name="genre" id="genre" class="form-select form-select-sm me-2" onchange="this.form.submit()">
+                    <option value="">All</option>
+                    @foreach($genres as $g)
+                        <option value="{{ $g }}" {{ $genre === $g ? 'selected' : '' }}>{{ $g }}</option>
+                    @endforeach
+                </select>
+                <input type="hidden" name="sort" value="{{ $sort }}">
+            </form>
         </div>
 
         <!-- SONG TABLE -->
@@ -134,7 +140,7 @@ body {
                 @empty
                     <tr>
                         <td colspan="3" class="text-center text-muted">
-                            Your playlist is empty. Add your first song.
+                            Your playlist is empty or no songs match this genre. Add your first song.
                         </td>
                     </tr>
                 @endforelse

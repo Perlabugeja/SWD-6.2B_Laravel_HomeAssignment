@@ -11,25 +11,35 @@ use Illuminate\Validation\ValidationException;
 
 class SongController extends Controller
 {
-    // List songs with sorting
+    // List songs with sorting and genre filter
     public function index(Request $request)
     {
         $sort = $request->query('sort', 'asc');
+        $genre = $request->query('genre', null);
 
-        // Whitelist sorting direction
+        // Validate sorting direction
         if (!in_array($sort, ['asc', 'desc'])) {
             $sort = 'asc';
         }
 
-        $songs = Song::whereHas('playlist', function ($query) {
+        $songsQuery = Song::whereHas('playlist', function ($query) {
             $query->where('user_id', Auth::id());
-        })
-        ->orderBy('songname', $sort)
-        ->get();
+        });
+
+        if ($genre) {
+            $songsQuery->where('genre', $genre);
+        }
+
+        $songs = $songsQuery->orderBy('songname', $sort)->get();
 
         $playlist = Playlist::where('user_id', Auth::id())->first();
 
-        return view('playlists.show', compact('songs', 'playlist', 'sort'));
+        // Get list of genres for filter dropdown
+        $genres = Song::whereHas('playlist', fn($q) => $q->where('user_id', Auth::id()))
+                      ->distinct()
+                      ->pluck('genre');
+
+        return view('playlists.show', compact('songs', 'playlist', 'sort', 'genres', 'genre'));
     }
 
     // Show create form
@@ -102,7 +112,7 @@ class SongController extends Controller
 
         $playlistName = $request->playlistname;
 
-        // No numbers allowed (no regex)
+        // No numbers allowed
         if (strpbrk($playlistName, '0123456789') !== false) {
             throw ValidationException::withMessages([
                 'playlistname' => 'Playlist name cannot contain numbers.'
