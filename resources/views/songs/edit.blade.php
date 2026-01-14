@@ -1,38 +1,49 @@
 @extends('layouts.main')
 
-@section('title', 'Edit Playlist Name')
+@section('title', 'Edit Song')
 
 @section('content')
 <div class="playlist-page">
     <div class="form-wrapper">
-        <h2 class="text-center">Edit Playlist Name</h2>
+        <h2 class="text-center">Edit Song</h2>
 
-        <form method="POST" action="{{ route('playlists.update') }}">
+        <form method="POST" action="{{ route('songs.update', $song) }}">
             @csrf
             @method('PUT')
 
             <div class="mb-3">
-                <label for="playlistname" class="form-label">Playlist Name</label>
+                <label for="songname" class="form-label">Song Name</label>
                 <input
                     type="text"
-                    id="playlistname"
-                    name="playlistname"
+                    id="songname"
+                    name="songname"
                     class="form-control"
-                    value="{{ old('playlistname', $playlist->playlistname ?? '') }}"
+                    value="{{ old('songname', $song->songname) }}"
                     required
                 >
-                @error('playlistname')
+                @error('songname')
+                    <div class="text-danger mt-1">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="mb-3">
+                <label for="genre" class="form-label">Genre</label>
+                <input
+                    type="text"
+                    id="genre"
+                    name="genre"
+                    class="form-control"
+                    value="{{ old('genre', $song->genre) }}"
+                    required
+                >
+                @error('genre')
                     <div class="text-danger mt-1">{{ $message }}</div>
                 @enderror
             </div>
 
             <div class="d-flex justify-content-between">
-                <button type="submit" class="btn btn-success">
-                    Update Playlist
-                </button>
-                <a href="{{ route('playlists.index') }}" class="btn btn-secondary">
-                    Back
-                </a>
+                <button type="submit" class="btn btn-success">Update Song</button>
+                <a href="{{ route('playlists.index') }}" class="btn btn-secondary">Back</a>
             </div>
         </form>
     </div>

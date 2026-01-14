@@ -17,19 +17,26 @@ class PlaylistController extends Controller
      */
     public function index(Request $request)
     {
-        $sort = in_array($request->query('sort'), ['asc', 'desc'])? $request->query('sort'): 'asc';
+        $sort = in_array($request->query('sort'), ['asc', 'desc'])
+            ? $request->query('sort')
+            : 'asc';
 
         $genre = $request->query('genre');
 
-        $songsQuery = Song::whereHas('playlist', fn($q) => $q->where('user_id', Auth::id()));
+        // Get the current user's playlist
+        $playlist = Playlist::where('user_id', Auth::id())->first();
+
+        // Get all songs belonging to this user's playlist
+        $songsQuery = Song::where('playlist_id', $playlist?->id ?? 0);
 
         if ($genre) {
             $songsQuery->where('genre', $genre);
         }
 
         $songs = $songsQuery->orderBy('songname', $sort)->get();
-        $playlist = Playlist::where('user_id', Auth::id())->first();
-        $genres = Song::whereHas('playlist', fn($q) => $q->where('user_id', Auth::id()))
+
+        // Get distinct genres for filter dropdown
+        $genres = Song::where('playlist_id', $playlist?->id ?? 0)
             ->distinct()
             ->pluck('genre');
 
@@ -55,12 +62,16 @@ class PlaylistController extends Controller
 
         // Reject numbers & symbols (only letters and spaces allowed)
         foreach (str_split($name) as $char) {
-            if (is_numeric($char)) throw ValidationException::withMessages([
-                'playlistname' => 'Playlist name cannot contain numbers.'
-            ]);
-            if (!ctype_alpha($char) && $char !== ' ') throw ValidationException::withMessages([
-                'playlistname' => 'Playlist name can only contain letters and spaces (no symbols).'
-            ]);
+            if (is_numeric($char)) {
+                throw ValidationException::withMessages([
+                    'playlistname' => 'Playlist name cannot contain numbers.'
+                ]);
+            }
+            if (!ctype_alpha($char) && $char !== ' ') {
+                throw ValidationException::withMessages([
+                    'playlistname' => 'Playlist name can only contain letters and spaces (no symbols).'
+                ]);
+            }
         }
 
         // Check if name is English
@@ -80,7 +91,7 @@ class PlaylistController extends Controller
             ->with('success', 'Playlist name updated!');
     }
 
-    /*Check if text is English using DetectLanguage API*/
+    /* Check if text is English using DetectLanguage API */
     private function isEnglish(string $text): bool
     {
         $http = Http::withToken(env('DETECTLANGUAGE_KEY'));
