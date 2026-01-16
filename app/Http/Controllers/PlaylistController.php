@@ -40,14 +40,14 @@ class PlaylistController extends Controller
         return view('playlists.show', compact('songs', 'playlist', 'sort', 'genres', 'genre'));
     }
 
-    /* Show form to edit playlist name */
+    // Show form to edit playlist name 
     public function edit()
     {
         $playlist = Playlist::where('user_id', Auth::id())->first();
         return view('playlists.edit-playlist', compact('playlist'));
     }
 
-    /* Update playlist name with validation */
+    // Update playlist name with validation *
     public function update(Request $request)
     {
         $request->validate([
@@ -90,25 +90,32 @@ class PlaylistController extends Controller
             ->with('success', 'Playlist name updated!');
     }
 
-    /* Check if text is English using DetectLanguage API */
+    // Check if text is English using DetectLanguage API 
     private function isEnglish(string $text): bool
     {
+        // Prepare HTTP client with API token
         $http = Http::withToken(env('DETECTLANGUAGE_KEY'));
-        // Skip SSL verification locally
+
+        // Skip SSL verification locally 
         if (app()->environment('local')) {
             $http = $http->withoutVerifying();
         }
 
-        $response = $http->post('https://ws.detectlanguage.com/0.2/detect', ['q' => $text]);
+        // Send text to DetectLanguage API
+        $response = $http->post(
+            'https://ws.detectlanguage.com/0.2/detect',
+            ['q' => $text]
+        );
 
-        // Get confidence score of the detected language
-        $confidence = $response['data']['detections'][0]['confidence'] ?? 0;
+        // Get detected language code (e.g. "en", "fr", "it")
+        $language = $response['data']['detections'][0]['language'] ?? null;
 
-        // Return true if confidence is high enough to be considered English
-        return $confidence >= 0.4;
+        // Return true only if the detected language is English
+        return $language === 'en';
     }
 
-    /* Check for profanity using APILayer Bad Words API */
+
+    // Check for profanity using APILayer Bad Words API 
     private function checkProfanity(string $text)
     {
         $apiKey = env('APILAYER_BADWORDS_KEY');

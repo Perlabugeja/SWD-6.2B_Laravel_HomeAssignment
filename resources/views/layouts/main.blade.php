@@ -23,40 +23,70 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
         <div class="container">
-            <a class="navbar-brand" href="/">Songify</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand fw-bold" href="{{ route('playlists.index') }}">
+                Songify
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto align-items-center">
+
                     @auth
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('playlists.index') }}">Playlist</a>
+                        <!-- Welcome message -->
+                        <li class="nav-item me-3 text-muted">
+                            Welcome, <strong>{{ auth()->user()->name }}</strong>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('playlists.index') }}">
+                                Playlist
+                            </a>
+                        </li>
+
                         <li class="nav-item">
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <button class="btn btn-link nav-link p-0" type="submit">Logout</button>
+                                <button type="submit"
+                                    class="btn btn-link nav-link p-0">
+                                    Logout
+                                </button>
                             </form>
                         </li>
                     @endauth
+
                     @guest
-                        <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('login') }}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('register') }}">Register</a>
+                        </li>
                     @endguest
+
                 </ul>
             </div>
         </div>
     </nav>
+
+    <!-- Flash success message -->
+    @if (session('success'))
+        <div class="container mt-3">
+            <div class="alert alert-success text-center">
+                {{ session('success') }}
+            </div>
+        </div>
+    @endif
 
     <!-- Main content -->
     <div class="container my-5">
         @yield('content')
     </div>
 
-    <!-- Bootstrap JS Bundle -->
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')
 </body>
