@@ -22,7 +22,8 @@ class Login extends Controller
             $request->session()->regenerate();
  
             // Redirect to intended page or home
-            return redirect()->intended('/')->with('success', 'Welcome back!');
+            return redirect()->intended(route('playlists.index'))
+                ->with('success', 'Welcome back!');
         }
  
         // If login fails, redirect back with error

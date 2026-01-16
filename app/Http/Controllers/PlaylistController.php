@@ -94,21 +94,21 @@ class PlaylistController extends Controller
     private function isEnglish(string $text): bool
     {
         $http = Http::withToken(env('DETECTLANGUAGE_KEY'));
-
+        // Skip SSL verification locally
         if (app()->environment('local')) {
             $http = $http->withoutVerifying();
         }
 
         $response = $http->post('https://ws.detectlanguage.com/0.2/detect', ['q' => $text]);
 
+        // Get confidence score of the detected language
         $confidence = $response['data']['detections'][0]['confidence'] ?? 0;
 
+        // Return true if confidence is high enough to be considered English
         return $confidence >= 0.4;
     }
 
-    /**
-     * Check for profanity using APILayer Bad Words API
-     */
+    /* Check for profanity using APILayer Bad Words API */
     private function checkProfanity(string $text)
     {
         $apiKey = env('APILAYER_BADWORDS_KEY');

@@ -8,7 +8,10 @@ use App\Http\Controllers\SongController;
 use App\Http\Controllers\PlaylistController;
 
 // Homepage
-Route::get('/', fn() => view('home'))->middleware('auth')->name('home');
+Route::get('/', fn () => redirect()->route('playlists.index'))
+    ->middleware('auth')
+    ->name('home');
+
 
 // Login & Register
 Route::middleware('guest')->group(function () {

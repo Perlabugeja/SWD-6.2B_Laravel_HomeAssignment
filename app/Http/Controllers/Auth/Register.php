@@ -31,6 +31,8 @@ class Register extends Controller
         Auth::login($user);
  
         // Redirect to home
-        return redirect('/')->with('success', 'Welcome to Chirper!');
+        return redirect()->route('playlists.index')
+                ->with('success', 'Welcome to your playlist!');
+
     }
 }
