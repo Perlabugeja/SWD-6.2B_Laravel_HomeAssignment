@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\Logout;
 use App\Http\Controllers\Auth\Register;
 use App\Http\Controllers\SongController;
 use App\Http\Controllers\PlaylistController;
+use App\Http\Controllers\FavouriteController;
 
 // Homepage
 Route::get('/', fn () => redirect()->route('playlists.index'))
@@ -38,4 +39,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/songs/{song}/edit', [SongController::class, 'edit'])->name('songs.edit');
     Route::put('/songs/{song}', [SongController::class, 'update'])->name('songs.update');
     Route::delete('/songs/{song}', [SongController::class, 'destroy'])->name('songs.destroy');
+
+
+
+    Route::post('/songs/{song}/favourite', [FavouriteController::class, 'set'])->name('songs.favourite');
+    Route::delete('/favourite', [FavouriteController::class, 'remove'])->name('favourite.remove');
+
+
 });

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Song;
 use App\Models\Playlist;
+use App\Models\Favourite;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -37,7 +38,17 @@ class PlaylistController extends Controller
             ->distinct()
             ->pluck('genre');
 
-        return view('playlists.show', compact('songs', 'playlist', 'sort', 'genres', 'genre'));
+        // Get the current user's favourite song ID (only one allowed)
+        $favouriteSongId = Favourite::where('user_id', Auth::id())->value('song_id');
+
+        return view('playlists.show', compact(
+            'songs',
+            'playlist',
+            'sort',
+            'genres',
+            'genre',
+            'favouriteSongId'
+        ));
     }
 
     // Show form to edit playlist name 
@@ -114,7 +125,6 @@ class PlaylistController extends Controller
         return $language === 'en';
     }
 
-
     // Check for profanity using APILayer Bad Words API 
     private function checkProfanity(string $text)
     {
@@ -133,9 +143,6 @@ class PlaylistController extends Controller
             'body' => $text,
         ]);
 
-        // Debug: uncomment to see API response
-        // dd($response->json());
-
         if (!$response->ok()) {
             throw ValidationException::withMessages([
                 'playlistname' => 'Unable to validate playlist name at this time.',
@@ -144,7 +151,6 @@ class PlaylistController extends Controller
 
         $data = $response->json();
 
-        // The API returns "bad_words_total" or "bad_words_list" depending on your plan
         $badWordsCount = $data['bad_words_total'] ?? 0;
 
         if ($badWordsCount > 0) {
