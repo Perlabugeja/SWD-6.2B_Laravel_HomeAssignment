@@ -5,6 +5,7 @@
 @section('content')
 <div class="playlist-page">
     <div class="form-wrapper">
+            @include('partials.alerts')
         <h2 class="text-center">Add New Song</h2>
 
         <form method="POST" action="{{ route('songs.store') }}">

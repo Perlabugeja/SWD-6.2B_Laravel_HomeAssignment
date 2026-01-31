@@ -5,6 +5,7 @@
 @section('content')
 <div class="playlist-page">
     <div class="form-wrapper">
+        @include('partials.alerts')
         <h2 class="text-center">Edit Song</h2>
 
         <form method="POST" action="{{ route('songs.update', $song) }}">
@@ -14,28 +15,28 @@
             <!-- Song Name -->
             <div class="mb-3">
                 <label for="songname" class="form-label">Song Name</label>
-                <input type="text" id="songname" name="songname" class="form-control" value="{{ old('songname', $song->songname) }}" required>
+                <input type="text" id="songname" name="songname" class="form-control" value="{{ old('songname', $song->songname) }}" >
                 @error('songname')<div class="text-danger mt-1">{{ $message }}</div>@enderror
             </div>
 
             <!-- Artist/Band -->
             <div class="mb-3">
                 <label for="artist" class="form-label">Artist/Band</label>
-                <input type="text" id="artist" name="artist" class="form-control" value="{{ old('artist', $song->artist) }}" required>
+                <input type="text" id="artist" name="artist" class="form-control" value="{{ old('artist', $song->artist) }}" >
                 @error('artist')<div class="text-danger mt-1">{{ $message }}</div>@enderror
             </div>
 
             <!-- Genre -->
             <div class="mb-3">
                 <label for="genre" class="form-label">Genre</label>
-                <input type="text" id="genre" name="genre" class="form-control" value="{{ old('genre', $song->genre) }}" required>
+                <input type="text" id="genre" name="genre" class="form-control" value="{{ old('genre', $song->genre) }}" >
                 @error('genre')<div class="text-danger mt-1">{{ $message }}</div>@enderror
             </div>
 
             <!-- Duration -->
             <div class="mb-3">
                 <label for="duration" class="form-label">Duration (mm:ss)</label>
-                <input type="text" id="duration" name="duration" class="form-control" value="{{ old('duration', $song->duration) }}" placeholder="e.g. 03:45" required>
+                <input type="text" id="duration" name="duration" class="form-control" value="{{ old('duration', $song->duration) }}" placeholder="e.g. 03:45" >
                 @error('duration')<div class="text-danger mt-1">{{ $message }}</div>@enderror
             </div>
 

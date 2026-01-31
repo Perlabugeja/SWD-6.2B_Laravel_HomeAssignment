@@ -5,6 +5,7 @@
 @section('content')
 <div class="playlist-page">
     <div class="form-wrapper">
+        @include('partials.alerts')
         <h1 class="mb-4 text-center">Create Account</h1>
 
         <form method="POST" action="/register">
@@ -12,13 +13,8 @@
             <!-- Name -->
             <div class="mb-3">
                 <label for="name" class="form-label">Name</label>
-                <input type="text"
-                       id="name"
-                       name="name"
-                       class="form-control @error('name') is-invalid @enderror"
-                       placeholder="John Doe"
-                       value="{{ old('name') }}"
-                       required>
+                <input type="text" id="name" name="name" class="form-control @error('name') is-invalid @enderror" 
+                placeholder="John Doe" value="{{ old('name') }}">
                 @error('name')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -27,13 +23,10 @@
             <!-- Email -->
             <div class="mb-3">
                 <label for="email" class="form-label">Email address</label>
-                <input type="email"
-                       id="email"
-                       name="email"
-                       class="form-control @error('email') is-invalid @enderror"
+                <input type="email" id="email" name="email" class="form-control @error('email') is-invalid @enderror"
                        placeholder="mail@example.com"
                        value="{{ old('email') }}"
-                       required>
+                       >
                 @error('email')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -47,7 +40,7 @@
                        name="password"
                        class="form-control @error('password') is-invalid @enderror"
                        placeholder="••••••••"
-                       required>
+                       >
                 @error('password')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -61,7 +54,7 @@
                        name="password_confirmation"
                        class="form-control"
                        placeholder="••••••••"
-                       required>
+                       >
             </div>
 
             <div class="d-grid">
