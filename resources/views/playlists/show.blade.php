@@ -6,8 +6,6 @@
 <div class="playlist-page">
     <div class="table-wrapper">
 
-        {{-- Alerts --}}
-        @include('partials.alerts')
 
         <!-- Header -->
         <div class="table-title d-flex justify-content-between align-items-center">

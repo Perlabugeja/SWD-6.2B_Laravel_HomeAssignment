@@ -6,8 +6,6 @@
 <div class="playlist-page">
     <div class="form-wrapper">
 
-        @include('partials.alerts')
-
         <h1 class="mb-4 text-center">Create Account</h1>
 
         <form method="POST" action="/register">

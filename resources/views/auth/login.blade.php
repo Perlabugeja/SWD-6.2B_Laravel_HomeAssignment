@@ -6,7 +6,6 @@
 <div class="playlist-page">
     <div class="form-wrapper">
 
-        @include('partials.alerts')
 
         <h1 class="mb-4 text-center">Welcome Back</h1>
 
