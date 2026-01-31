@@ -6,20 +6,33 @@
 <div class="playlist-page">
     <div class="table-wrapper">
 
-
         <!-- Header -->
         <div class="table-title d-flex justify-content-between align-items-center">
             <div>
                 <h2>Manage <b>Songs</b></h2>
-                <div class="playlist-name">{{ $playlist?->playlistname ?? 'My Playlist' }}</div>
+
+                <div class="playlist-name fw-bold">
+                    {{ $playlist?->playlistname ?? 'My Playlist' }}
+                </div>
+
+                @if($favourite && $favourite->song)
+                    <div class="text-muted small mt-1">
+                        Favourite: <strong>{{ $favourite->song->songname }}</strong>
+                        by {{ $favourite->song->artist }}
+                    </div>
+                @else
+                    <div class="text-muted small mt-1">
+                        No favourite song selected
+                    </div>
+                @endif
             </div>
 
             <div>
                 <a href="{{ route('songs.create') }}" class="btn btn-success">Add New Song</a>
                 <a href="{{ route('playlist.edit') }}" class="btn btn-success">Edit Playlist Name</a>
 
-                {{-- Optional: remove favourite --}}
-                @if(!empty($favouriteSongId))
+                {{-- Remove favourite --}}
+                @if($favourite && $favourite->song)
                     <form action="{{ route('favourite.remove') }}" method="POST" style="display:inline-block;">
                         @csrf
                         @method('DELETE')
@@ -88,8 +101,8 @@
                             <form action="{{ route('songs.favourite', $song) }}" method="POST" style="display:inline-block;">
                                 @csrf
                                 <button type="submit"
-                                        class="btn btn-sm {{ ($favouriteSongId ?? null) === $song->id ? 'btn-success' : 'btn-secondary' }}">
-                                    {{ ($favouriteSongId ?? null) === $song->id ? '★ Favourite' : 'Set Favourite' }}
+                                    class="btn btn-sm {{ ($favourite && $favourite->song_id === $song->id) ? 'btn-success' : 'btn-secondary' }}">
+                                    {{ ($favourite && $favourite->song_id === $song->id) ? '★ Favourite' : 'Set Favourite' }}
                                 </button>
                             </form>
                         </td>

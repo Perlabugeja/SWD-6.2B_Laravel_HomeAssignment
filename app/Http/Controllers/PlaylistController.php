@@ -38,8 +38,10 @@ class PlaylistController extends Controller
             ->distinct()
             ->pluck('genre');
 
-        // Get the current user's favourite song ID (only one allowed)
-        $favouriteSongId = Favourite::where('user_id', Auth::id())->value('song_id');
+        // Get the user's favourite song (with song details)
+        $favourite = Favourite::where('user_id', Auth::id())
+            ->with('song')
+            ->first();
 
         return view('playlists.show', compact(
             'songs',
@@ -47,11 +49,11 @@ class PlaylistController extends Controller
             'sort',
             'genres',
             'genre',
-            'favouriteSongId'
+            'favourite'
         ));
     }
 
-    // Show form to edit playlist name 
+    // Show form to edit playlist name
     public function edit()
     {
         $playlist = Playlist::where('user_id', Auth::id())->first();
@@ -101,13 +103,13 @@ class PlaylistController extends Controller
             ->with('success', 'Playlist name updated!');
     }
 
-    // Check if text is English using DetectLanguage API 
+    // Check if text is English using DetectLanguage API
     private function isEnglish(string $text): bool
     {
         // Prepare HTTP client with API token
         $http = Http::withToken(env('DETECTLANGUAGE_KEY'));
 
-        // Skip SSL verification locally 
+        // Skip SSL verification locally
         if (app()->environment('local')) {
             $http = $http->withoutVerifying();
         }
@@ -125,7 +127,7 @@ class PlaylistController extends Controller
         return $language === 'en';
     }
 
-    // Check for profanity using APILayer Bad Words API 
+    // Check for profanity using APILayer Bad Words API
     private function checkProfanity(string $text)
     {
         $apiKey = env('APILAYER_BADWORDS_KEY');
