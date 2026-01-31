@@ -18,4 +18,10 @@ class Song extends Model
     {
         return $this->belongsTo(Playlist::class);
     }
+    
+        public function favourites()
+    {
+        return $this->hasMany(Favourite::class);
+    }
+
 }

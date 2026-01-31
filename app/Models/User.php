@@ -47,4 +47,11 @@ class User extends Authenticatable
         return $this->hasMany(Playlist::class);
     }
 
+    public function favourite()
+    {
+        return $this->hasOne(\App\Models\Favourite::class);
+    }
+
+
+
 }
