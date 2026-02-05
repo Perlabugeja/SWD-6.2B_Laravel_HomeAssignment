@@ -40,8 +40,6 @@ Route::middleware('auth')->group(function () {
     Route::put('/songs/{song}', [SongController::class, 'update'])->name('songs.update');
     Route::delete('/songs/{song}', [SongController::class, 'destroy'])->name('songs.destroy');
 
-
-
     Route::post('/songs/{song}/favourite', [FavouriteController::class, 'set'])->name('songs.favourite');
     Route::delete('/favourite', [FavouriteController::class, 'remove'])->name('favourite.remove');
 

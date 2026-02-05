@@ -13,11 +13,12 @@ class Playlist extends Model
     public function songs(){
         return $this->hasMany(Song::class);
     }
-
+    
     public function user()
     {
         return $this->belongsTo(\App\Models\User::class);
     }
+
 
     // Enable Mass Assignment
     protected $fillable = ['playlistname', 'user_id'];
